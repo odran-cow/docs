@@ -4,24 +4,22 @@ sidebar_position: 2
 
 # Solvers
 
-CoW Protocol delivers optimal price outcomes by leveraging an open solver competition for order matching. 
+**Solvers** are participants in CoW Protocol that compete to propose settlement solutions for orders expressing users' [trading intents](./intents). A **settlement solution** specifies which eligible orders could be filled and how the required liquidity would be sourced.
+
+In this documentation, *solver* can refer either to a participating operator or to its software. A solver setup typically combines a [solver engine](/cow-protocol/tutorials/arbitrate/solver/solver-engine), which computes solutions, and a [driver](/cow-protocol/tutorials/arbitrate/solver/driver), which connects to the auction infrastructure and handles settlement submissions. These functions may be implemented together or operated separately, including by different parties.
 
 ![Solvers](/img/concepts/solvers.png)
 
-Solvers are independent, bonded participants that compete to construct valid settlement solutions for user-signed intents through CoW Protocol's [intent-based delegated execution model](intents).
+## What solvers do
 
-Once a user submits an [intent](intents), the protocol groups it alongside other intents in a batch auction.
-As soon as a batch is "closed for orders", meaning that it stops considering new orders, the protocol runs a [competition](/cow-protocol/reference/core/auctions) where solvers submit solutions for the intents in the batch. 
+In a [batch auction](./fair-combinatorial-auction), solvers may match compatible orders through a [Coincidence of Wants](../how-it-works/coincidence-of-wants) or use liquidity sources available to them, such as decentralised exchanges.
 
-The solver whose [solution](/cow-protocol/reference/core/auctions/the-problem#solution) generates the greatest surplus for the batch is selected to submit the winning settlement solution. 
+The [auction mechanism](/cow-protocol/reference/core/auctions) evaluates proposed solutions according to defined competition rules and may select one or more winners. Selected solutions may then be submitted for on-chain settlement, subject to the checks enforced by the [settlement contract](/cow-protocol/reference/contracts/core/settlement).
 
-Solvers are compensated in COW tokens for successful settlement submissions, incentivizing them to compete to find better prices and submit valid solutions for user-signed intents. 
+## Why solver competition matters
 
-## How Solvers Work
+Different solvers may propose different ways to use available liquidity and match orders. This competition can create opportunities for more efficient settlement and [price improvement](../benefits/price-improvement), but neither is guaranteed for any particular order.
 
-Solvers can move tokens on behalf of the user using the `ERC-20` approvals that the user granted to the [vault relayer](/cow-protocol/reference/contracts/core/vault-relayer) contract.
-The [settlement](/cow-protocol/reference/contracts/core/settlement) contract, meanwhile, verifies the signature of the user's intent and ensures that execution happens according to the limit price and quantity specified by the user.
+## Participating as a solver
 
-Solvers do not receive ERC-20 approvals from users. Token transfers occur through the protocol’s smart contracts, using the ERC-20 approvals that users grant to the [vault relayer](/cow-protocol/reference/contracts/core/vault-relayer) contract. The [settlement](/cow-protocol/reference/contracts/core/settlement) contract verifies each user’s signed intent and enforces the applicable limit price, quantity and settlement constraints.
-
-Anyone with some DeFi knowledge and ability to code an optimizations algorithm can create a solver.
+Anyone can develop a solver, but joining the live competition requires [onboarding and authorisation](/cow-protocol/tutorials/solvers/onboard). Participating solvers may receive [COW rewards](/cow-protocol/reference/core/auctions/rewards) under the applicable reward rules.
