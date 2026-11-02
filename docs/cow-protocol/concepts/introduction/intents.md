@@ -4,33 +4,18 @@ sidebar_position: 1
 
 # Intents
 
-Rather than placing orders by _**signing a raw transaction**_ that executes directly on-chain (i.e. as happens on Uniswap or SushiSwap), CoW Protocol users place orders by _**signing an "intent to trade" message**_ that specifies parameters like the assets and amounts they would like to trade.
-An intent is not an executable user transaction. It is a signed expression of trading constraints. Solvers compete to construct settlement solutions that satisfy those constraints, and the settlement contract verifies the user’s signature and settlement conditions before execution. 
+An **intent** describes the trading outcome a user is willing to accept, rather than a specific route for executing a swap. In CoW Protocol, users typically express an intent through an **order** that specifies the tokens and amounts to trade, together with conditions such as a limit price and an expiration time.
 
-There are a number of [financial](#financial-benefits-of-intents) and [technical](#technical-benefits-of-intents) advantages to intent-based trading.
+For example, a user might authorise selling 1 WETH for **at least 2,000 USDC** before a specified deadline. This defines an acceptable outcome; it does not guarantee that the order will be settled.
 
-## Financial Benefits of Intents
+## Why intents matter
 
-When a user places a trade directly on-chain, the execution path is set in stone and the trader receives whatever price (+/- slippage) the AMM or aggregator they're trading on gives them. 
+By specifying an acceptable trading outcome rather than a fixed execution route, users allow [solvers](./solvers) to explore different ways of settling their orders within the authorised constraints.
 
-Thanks to its intent-based architecture, CoW Protocol separates user intent expression from settlement-route optimization. Independent [solvers](./solvers) compete to find valid settlement paths that satisfy user-signed constraints.
+In CoW Protocol, this flexibility enables solvers to compete using different liquidity sources and allows [batch auctions](./fair-combinatorial-auction) to create opportunities for matching compatible orders through a [Coincidence of Wants](../how-it-works/coincidence-of-wants). These mechanisms can contribute to [price improvement](../benefits/price-improvement) and more efficient settlement.
 
-Solvers not only scan all available on-chain liquidity (similar to a DEX aggregator) they also provide extra price improvements in several ways:
+## From authorisation to settlement
 
-- [**Coincidence of Wants**](../how-it-works/coincidence-of-wants): Direct P2P (peer-to-peer) matching for two or more users who have expressed opposite buy and sell intents for the same token pair.
-  This optimization, enabled by batch auctions, allows users to bypass liquidity provider (LP) fees and it reduces the gas fees for trading as orders don't need to interact with other non-CoW Protocol smart contracts.
-- **Private Market Maker Inventory**: Many solvers have access to off-chain liquidity through CEX inventory, integration with private market makers, or private liquidity of their own.
-  This allows them to fill certain trades at better prices than what may be available through on-chain AMMs at any given time.
-- [**MEV Protection**](../benefits/mev-protection): On CoW Protocol, users are never exposed to MEV bots. Instead, solvers compete to provide settlement solutions for batches of intents. The winning solver must satisfy the prices and constraints signed by users and bears the execution-path and MEV risk associated with sourcing that settlement.
-  In addition, solvers submit all orders in a batch at a uniform clearing price, meaning there is no advantage to re-ordering trades (the basis of all MEV exploitation).
+Users typically authorise orders by signing their parameters off-chain. The protocol also supports [smart-contract signatures and on-chain pre-signing](/cow-protocol/reference/core/signing-schemes). Authorising an order does not itself execute a swap or transfer tokens. A settlement can occur only if the applicable order authorisation and on-chain constraints are satisfied.
 
-## Technical Benefits of Intents
-
-The intent-based architecture of CoW Protocol also provides a number of technical benefits: 
-
-- Enabling [solvers](./solvers) to construct and submit settlement solutions involving different types of transactions, not only trades, based on user-defined parameters and relevant on-chain conditions.
-- Establishing additional rules for the way orders settle on-chain, such as guaranteeing that the trade is settled at [EBBO](/cow-protocol/reference/core/definitions#ebbo) (Ethereum best bid and offer, guaranteeing that the baseline price for the trade is what on-chain AMMs offer) and uniform clearing prices (where trades with the same token pair in the same batch are cleared at the same price)
-- Allowing users to pay gas fees in their *sell token* without needing to hold the chain-native token (like ETH) in their wallet
-- Eliminating fees for failed transactions
-- Allowing users to place multiple orders at once
-- Allowing the protocol to settle orders in batches, generating efficiencies from [Coincidence of Wants](../how-it-works/coincidence-of-wants) or gas savings.
+For the next steps, see [How intents are formed](../how-it-works/how-intents-are-formed) and [Flow of an order](../how-it-works/flow-of-an-order).
